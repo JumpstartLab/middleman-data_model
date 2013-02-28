@@ -1,7 +1,8 @@
 module Middleman
   module DataModel
 
-    class SimpleDataModel < OpenStruct
+    class SimpleDataModel
+
       def self.all
         @data.map {|item| new item }
       end
@@ -20,6 +21,19 @@ module Middleman
 
       def self.models
         @models ||= []
+      end
+
+
+      def initialize(params = {})
+        params.each do |key,value|
+          instance_variable_set("@#{key}",value)
+
+          next if respond_to? key
+
+          self.class.send :define_method, key do
+            instance_variable_get("@#{key}")
+          end
+        end
       end
     end
 
